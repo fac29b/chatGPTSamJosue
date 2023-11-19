@@ -2,6 +2,9 @@ const apikey = document.querySelector(".apikey")
 const textarea = document.querySelector("textarea")
 const article = document.querySelector('article');
 const submitBtn = document.querySelector('button');
+const response = document.querySelector('.response');
+
+console.log(response);
 
 submitBtn.addEventListener('click', captureFormValue)
 
@@ -45,6 +48,23 @@ function captureFormValue(e) {
     })
     .then(response => response.json())
     .then(data => {
+        console.log('Response:', data);
+        // Accessing the content of the message
+        if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+            response.innerHTML = "Answer:" + "  " + data.choices[0].message.content;
+            
+            console.log('Message Content:', data.choices[0].message.content);
+            // You can process or display this content as needed
+        } else {
+            console.log('No message content available');
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    })
+    
+    .then(response => response.json())
+    .then(data => {
         console.log('Failed:', data);
         // Process the response data as needed
     })
@@ -53,4 +73,4 @@ function captureFormValue(e) {
     });
 }
 
-
+// choices.message.content
