@@ -1,13 +1,13 @@
-const apikey = document.querySelector(".apikey")
 const textarea = document.querySelector("textarea")
 const article = document.querySelector('article');
 const submitBtn = document.querySelector('button');
 const response = document.querySelector('.response');
-
+const openai = new OpenAI({ apikey: process.env.OPEN_API_KEY,
+});
 console.log(response);
 
 submitBtn.addEventListener('click', captureFormValue)
-
+.get 
 // function captureFormValue(e) {
 //     e.preventDefault();
 
@@ -25,25 +25,32 @@ submitBtn.addEventListener('click', captureFormValue)
 //         headers: {"content-type": "application/json"},
 //     })
 // }
-
+let conversationHistory = [];
 function captureFormValue(e) {
     e.preventDefault();
 
-    let storeApi = apikey.value;
-    let textValue = textarea.value; 
+let textValue =textarea.value;
+textarea.value = '';
 
-    apikey.value = '';
-    textarea.value = ''; 
-    
+conversationHistory.push({role: 'user', content: textValue });
 
-    const data = { messages: [{ role: 'user', content: textValue}], model: "gpt-3.5-turbo" }; // Assuming textValue is the prompt for the OpenAI API
+
+ const aiAPI = 'https://api.openai.com/v1/chat/completions';  
+
+    const data = {  model: "gpt-4", messages: [{
+        role: 'system',
+        content: "You are a helpful AI assistant.",
+    }, {
+        role: 'user',
+        content: textValue,
+    },], }; // Assuming textValue is the prompt for the OpenAI API
     console.log(data);
-    fetch("https://api.openai.com/v1/chat/completions", {
+    fetch(aiAPI, {
         method: "POST",
         body: JSON.stringify(data),
         headers: {
             "content-Type": "application/json",
-            "Authorization": `Bearer ${storeApi}` // Include the API key here
+            "Authorization": `Bearer ${OPEN_API_KEY}` // Include the API key here
         },
     })
     .then(response => response.json())
@@ -51,6 +58,8 @@ function captureFormValue(e) {
         console.log('Response:', data);
         // Accessing the content of the message
         if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+            const aiResponse = data.choices[0].message.content; // ADDED AI RESPONSE VARIABLE 
+            conversationHistory.push({ role: 'system', content: aiResponse}); //PUSH BOT REPLY INTO HISTORY ARRAY 
             response.innerHTML = "Answer:" + "  " + data.choices[0].message.content;
             
             console.log('Message Content:', data.choices[0].message.content);
